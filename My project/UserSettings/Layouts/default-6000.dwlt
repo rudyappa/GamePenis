@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 989
   m_ShowMode: 4
-  m_Title: Project
+  m_Title: Hierarchy
   m_RootView: {fileID: 6}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -94,7 +94,7 @@ MonoBehaviour:
     x: 0
     y: 0
     width: 363
-    height: 553
+    height: 845
   m_MinSize: {x: 201, y: 226}
   m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 15}
@@ -118,9 +118,9 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 553
+    y: 845
     width: 1466
-    height: 380
+    height: 88
   m_MinSize: {x: 231, y: 276}
   m_MaxSize: {x: 10001, y: 10026}
   m_ActualView: {fileID: 13}
@@ -246,7 +246,7 @@ MonoBehaviour:
     x: 0
     y: 0
     width: 1466
-    height: 553
+    height: 845
   m_MinSize: {x: 200, y: 56}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
@@ -270,7 +270,7 @@ MonoBehaviour:
     x: 363
     y: 0
     width: 1103
-    height: 553
+    height: 845
   m_MinSize: {x: 202, y: 226}
   m_MaxSize: {x: 4002, y: 4026}
   m_ActualView: {fileID: 16}
@@ -569,9 +569,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 632
+    y: 924
     width: 1465
-    height: 354
+    height: 62
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -610,20 +610,21 @@ MonoBehaviour:
   m_LastFolders:
   - Assets
   m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Users\kostya1327\Documents\GitHub\GamePenis\My project
+  m_LastProjectPath: "C:\\Users\\\u041D\u0438\u043A\u0438\u0442\u0430\\Documents\\GitHub\\GamePenis\\My
+    project"
   m_LockTracker:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
+    scrollPos: {x: 0, y: 54}
     m_SelectedIDs:
-    - m_rawData: 568105584918812382
+    - m_rawData: 568105584918812326
     m_LastClickedID:
-      m_rawData: 568105584918812382
+      m_rawData: 568105584918812326
     m_ExpandedIDs:
-    - m_rawData: 568105589213753394
+    - m_rawData: 568105589213753956
     - m_rawData: 0
-    - m_rawData: 568105584918812382
+    - m_rawData: 568105584918812326
     - m_rawData: 568105587066273791
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -656,7 +657,9 @@ MonoBehaviour:
     m_SelectedIDs: []
     m_LastClickedID:
       m_rawData: 0
-    m_ExpandedIDs: []
+    m_ExpandedIDs:
+    - m_rawData: 0
+    - m_rawData: 568105584918812326
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -687,7 +690,7 @@ MonoBehaviour:
     m_SelectedInstanceIDs: []
     m_LastClickedEntityId:
       m_rawData: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: []
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -797,7 +800,7 @@ MonoBehaviour:
     x: 0
     y: 79
     width: 362
-    height: 527
+    height: 819
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -820,7 +823,7 @@ MonoBehaviour:
       m_LastClickedID:
         m_rawData: 0
       m_ExpandedIDs:
-      - m_rawData: 568105589213753728
+      - m_rawData: 568105589213754266
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -871,7 +874,7 @@ MonoBehaviour:
     x: 363
     y: 79
     width: 1101
-    height: 527
+    height: 819
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1276,9 +1279,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: -3.971323, y: 5.9568157, z: 2.167399}
+    m_Target: {x: -1.2338228, y: 5.070898, z: -2.6424823}
     speed: 2
-    m_Value: {x: -3.971323, y: 5.9568157, z: 2.167399}
+    m_Value: {x: -1.2338228, y: 5.070898, z: -2.6424823}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1325,13 +1328,13 @@ MonoBehaviour:
     m_gridOpacity: 0.5
     m_NearestPlaneToHandleMode: 0
   m_Rotation:
-    m_Target: {x: -0.03599207, y: 0.8587733, z: -0.060911305, w: -0.5074465}
+    m_Target: {x: -0.032348596, y: 0.8576797, z: -0.05437209, w: -0.51027787}
     speed: 2
-    m_Value: {x: -0.03608341, y: 0.85801154, z: -0.060857274, w: -0.50873435}
+    m_Value: {x: -0.032430105, y: 0.85691303, z: -0.054323487, w: -0.51156366}
   m_Size:
-    m_Target: 7.4038243
+    m_Target: 8.91802
     speed: 2
-    m_Value: 7.0849996
+    m_Value: 8.91802
   m_Ortho:
     m_Target: 0
     speed: 2

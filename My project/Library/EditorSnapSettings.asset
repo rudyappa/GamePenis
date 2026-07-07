@@ -19,4 +19,4 @@ MonoBehaviour:
     m_SnapToGrid: 1
     m_Rotation: 15
     m_Scale: 1
-    m_IncrementalSnapSize: {x: 0.25, y: 0.25, z: 0.25}
+    m_IncrementalSnapSize: {x: 2, y: 2, z: 2}

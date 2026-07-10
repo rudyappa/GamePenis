@@ -1,31 +1,41 @@
 {
   "context": {
     "projectPath": "C:/Users/kostya1327/Documents/GitHub/GamePenis/My project/Packages",
-    "unityVersion": "6000.5.2f1"
+    "unityVersion": "6000.0.79f1"
   },
   "inputs": [
     "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Packages\\manifest.json",
     "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Packages\\packages-lock.json",
-    "C:\\Program Files\\Unity\\Hub\\Editor\\6000.5.2f1\\Editor\\Data\\Resources\\PackageManager\\BuiltInPackages\\BuiltInPackagesCombined.sha1"
+    "C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.79f1\\Editor\\Data\\Resources\\PackageManager\\BuiltInPackages\\BuiltInPackagesCombined.sha1"
   ],
   "outputs": {
-    "com.unity.multiplayer.center@1.0.1": {
+    "com.unity.multiplayer.center@1.0.0": {
       "name": "com.unity.multiplayer.center",
       "displayName": "Multiplayer Center",
-      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.multiplayer.center@b860850997d0",
-      "fingerprint": "b860850997d026668b04ee7b71cb731ee193804c",
+      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.multiplayer.center@f3fb577b3546",
+      "fingerprint": "f3fb577b3546594b97b8cc34307cd621f60f1c73",
       "editorCompatibility": "6000.0.0a1",
-      "version": "1.0.1",
+      "version": "1.0.0",
       "source": "builtin",
       "testable": false
     },
-    "com.unity.ugui@2.5.0": {
+    "com.unity.nuget.mono-cecil@1.10.2": {
+      "name": "com.unity.nuget.mono-cecil",
+      "displayName": "Mono Cecil",
+      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.nuget.mono-cecil@e899d8bace39",
+      "fingerprint": "e899d8bace392d74958799be136b2df74d3642a6",
+      "editorCompatibility": "2018.4.0a1",
+      "version": "1.10.2",
+      "source": "registry",
+      "testable": false
+    },
+    "com.unity.ugui@2.0.0": {
       "name": "com.unity.ugui",
-      "displayName": "uGUI",
-      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.ugui@3d1ea40b73ef",
-      "fingerprint": "3d1ea40b73eff422067a627993f722d3287a9920",
-      "editorCompatibility": "6000.5.0a1",
-      "version": "2.5.0",
+      "displayName": "Unity UI",
+      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.ugui@4601c9db1b9b",
+      "fingerprint": "4601c9db1b9bb9a125500e6cd3e16299066ec4bc",
+      "editorCompatibility": "2019.2.0a1",
+      "version": "2.0.0",
       "source": "builtin",
       "testable": false
     },
@@ -33,14 +43,6 @@
       "name": "com.unity.modules.accessibility",
       "displayName": "Accessibility",
       "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.modules.accessibility",
-      "version": "1.0.0",
-      "source": "builtin",
-      "testable": false
-    },
-    "com.unity.modules.adaptiveperformance@1.0.0": {
-      "name": "com.unity.modules.adaptiveperformance",
-      "displayName": "Adaptive Performance",
-      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.modules.adaptiveperformance",
       "version": "1.0.0",
       "source": "builtin",
       "testable": false
@@ -149,14 +151,6 @@
       "source": "builtin",
       "testable": false
     },
-    "com.unity.modules.physicscore2d@1.0.0": {
-      "name": "com.unity.modules.physicscore2d",
-      "displayName": "Physics Core 2D",
-      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.modules.physicscore2d",
-      "version": "1.0.0",
-      "source": "builtin",
-      "testable": false
-    },
     "com.unity.modules.screencapture@1.0.0": {
       "name": "com.unity.modules.screencapture",
       "displayName": "Screen Capture",
@@ -257,14 +251,6 @@
       "name": "com.unity.modules.unitywebrequestwww",
       "displayName": "Unity Web Request WWW",
       "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.modules.unitywebrequestwww",
-      "version": "1.0.0",
-      "source": "builtin",
-      "testable": false
-    },
-    "com.unity.modules.vectorgraphics@1.0.0": {
-      "name": "com.unity.modules.vectorgraphics",
-      "displayName": "Vector Graphics",
-      "resolvedPath": "C:\\Users\\kostya1327\\Documents\\GitHub\\GamePenis\\My project\\Library\\PackageCache\\com.unity.modules.vectorgraphics",
       "version": "1.0.0",
       "source": "builtin",
       "testable": false

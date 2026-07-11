@@ -1,9 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
     public int slotCount = 5;
     public Transform holdPoint;
+
+    // Ссылки на UI-иконки (перетащишь в инспекторе)
+    public Image[] slotIcons;
 
     private GameObject[] slots;
     public int SelectedSlot { get; private set; } = 0;
@@ -37,8 +41,8 @@ public class Inventory : MonoBehaviour
             {
                 slots[i] = item;
                 pickable.PickUp(holdPoint);
-                item.SetActive(i == SelectedSlot); // видно только если это активный слот
-                if (i == SelectedSlot) ShowSlot(i);
+                item.SetActive(i == SelectedSlot);
+                UpdateSlotUI(i); // обновляем иконку
                 return true;
             }
         }
@@ -53,12 +57,14 @@ public class Inventory : MonoBehaviour
     public void ClearSelectedSlot()
     {
         slots[SelectedSlot] = null;
+        UpdateSlotUI(SelectedSlot); // обновляем UI
     }
 
     public GameObject GetSlot(int index) => slots[index];
 
     void SelectSlot(int index)
     {
+        // Скрываем текущий слот
         if (slots[SelectedSlot] != null)
             slots[SelectedSlot].SetActive(false);
 
@@ -70,5 +76,41 @@ public class Inventory : MonoBehaviour
     {
         if (slots[index] != null)
             slots[index].SetActive(true);
+    }
+
+    // ==== НОВЫЙ МЕТОД ДЛЯ ОБНОВЛЕНИЯ UI ====
+    void UpdateSlotUI(int slotIndex)
+    {
+        if (slotIcons == null || slotIndex >= slotIcons.Length) return;
+
+        GameObject item = slots[slotIndex];
+        if (item != null)
+        {
+            // Пытаемся найти компонент ItemData
+            ItemData data = item.GetComponent<ItemData>();
+            if (data != null && data.itemIcon != null)
+            {
+                slotIcons[slotIndex].sprite = data.itemIcon;
+                slotIcons[slotIndex].color = Color.white;
+                slotIcons[slotIndex].enabled = true;
+            }
+            else
+            {
+                // Если нет ItemData — используем цвет кубика
+                Renderer rend = item.GetComponent<Renderer>();
+                if (rend != null)
+                {
+                    slotIcons[slotIndex].sprite = null;
+                    slotIcons[slotIndex].color = rend.material.color;
+                    slotIcons[slotIndex].enabled = true;
+                }
+            }
+        }
+        else
+        {
+            // Слот пуст — убираем иконку
+            slotIcons[slotIndex].sprite = null;
+            slotIcons[slotIndex].enabled = false;
+        }
     }
 }

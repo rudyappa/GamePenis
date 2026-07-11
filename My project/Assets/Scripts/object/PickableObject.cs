@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PickableObject : MonoBehaviour
 {
+    public Transform holdPoint;
     private Rigidbody rb;
     private Collider col;
 
@@ -28,25 +29,35 @@ public class PickableObject : MonoBehaviour
     }
 
     public void PickUp(Transform holdPoint)
+{
+    rb.isKinematic = true;
+    transform.SetParent(holdPoint);
+    
+    // Берём настройки позы из ItemData
+    ItemData data = GetComponent<ItemData>();
+    if (data != null)
     {
-        rb.isKinematic = true;
-        transform.SetParent(holdPoint);
+        transform.localPosition = data.holdPosition;
+        transform.localRotation = Quaternion.Euler(data.holdRotation);
+    }
+    else
+    {
+        // Если нет ItemData — ставим в центр (как раньше)
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
     }
 
-    public void Drop(Vector3 throwForce)
-    {
-        transform.SetParent(null);
-        rb.isKinematic = false;
-        rb.linearVelocity = throwForce;
-    }
+    col.enabled = false;
+}
 
-    public void PlaceDown()
-    {
-        transform.SetParent(null);
-        rb.isKinematic = false;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-    }
+public void PlaceDown()
+{
+    transform.SetParent(null);
+    rb.isKinematic = false;
+    rb.linearVelocity = Vector3.zero;
+    rb.angularVelocity = Vector3.zero;
+
+    // ВКЛЮЧАЕМ КОЛЛАЙДЕР
+    col.enabled = true;
+}
 }

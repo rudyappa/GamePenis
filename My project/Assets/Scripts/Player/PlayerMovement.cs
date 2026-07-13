@@ -1,46 +1,72 @@
+using Fusion;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
-    public float moveSpeed = 5f;      // скорость ходьбы
-    public float gravity = -9.81f;    // сила гравитации
-    public float jumpHeight = 1.2f;   // высота прыжка (если понадобится)
+    [Header("Movement")]
+    public float Speed = 5f;
+    public float JumpHeight = 1.2f;
+    public float Gravity = -15f;
+    public float TurnSmoothTime = 0.08f;
 
-    private CharacterController controller;
-    private Vector3 velocity;         // текущая вертикальная скорость (падение/прыжок)
-    private bool isGrounded;
+    private CharacterController _controller;
+    private Vector3 _velocity;
+    private float _turnSmoothVelocity;
+    private NetworkInput _input;
 
-    void Start()
+    private void Awake()
     {
-        controller = GetComponent<CharacterController>();
+        _controller = GetComponent<CharacterController>();
     }
 
-    void Update()
+    public override void FixedUpdateNetwork()
     {
-        isGrounded = controller.isGrounded;
+        // Двигаемся только на своей машине
+        if (!Object.HasStateAuthority) return;
 
-        // если стоим на земле и скорость падения отрицательная — обнуляем её
-        if (isGrounded && velocity.y < 0)
+        // ---- ПОЛУЧАЕМ ВВОД ИЗ СЕТИ (автоматически) ----
+        if (GetInput(out NetworkInput input))
         {
-            velocity.y = -2f; // небольшое отрицательное значение, чтобы "прижимало" к земле
+            _input = input;
         }
 
-        // считываем ввод с клавиатуры (WASD или стрелки)
-        float x = Input.GetAxis("Horizontal"); // A/D
-        float z = Input.GetAxis("Vertical");   // W/S
+        // ---- ГРАВИТАЦИЯ ----
+        _velocity.y += Gravity * Runner.DeltaTime;
 
-        // направление движения относительно того, куда смотрит игрок
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * moveSpeed * Time.deltaTime);
-
-        // прыжок по пробелу (можно убрать, если хоррору прыжки не нужны)
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        // ---- ПРЫЖОК ----
+        if (_input.Jump && _controller.isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            _velocity.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
         }
 
-        // применяем гравитацию
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        // ---- ДВИЖЕНИЕ ----
+        Vector3 direction = new Vector3(_input.Horizontal, 0, _input.Vertical).normalized;
+
+        if (direction.magnitude >= 0.1f)
+        {
+            // Плавный поворот
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle,
+                ref _turnSmoothVelocity, TurnSmoothTime);
+            transform.rotation = Quaternion.Euler(0, angle, 0);
+
+            // Движение вперёд
+            Vector3 move = transform.forward * Speed;
+            move.y = _velocity.y;
+            _controller.Move(move * Runner.DeltaTime);
+        }
+        else
+        {
+            // Только гравитация
+            _controller.Move(_velocity * Runner.DeltaTime);
+        }
+
+        // ---- КАМЕРА ----
+        if (Camera.main != null && Object.HasStateAuthority)
+        {
+            Vector3 camPos = transform.position + new Vector3(0, 1.8f, -4f);
+            Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, camPos, Time.deltaTime * 10f);
+            Camera.main.transform.LookAt(transform.position + Vector3.up * 1.2f);
+        }
     }
 }

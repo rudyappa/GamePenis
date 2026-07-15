@@ -4,23 +4,28 @@ using UnityEngine;
 public class PlayerSpawner : MonoBehaviour
 {
     public GameObject PlayerPrefab;
+    [Header("Перетащи сюда объект SpawnPoint из сцены")]
+    public Transform SpawnPoint; 
+
     private NetworkRunner _runner;
 
     private void Start()
     {
-        _runner = FindObjectOfType<NetworkRunner>();
+        _runner = Object.FindFirstObjectByType<NetworkRunner>();
     }
 
     private void Update()
     {
-        // Если подключился новый игрок (локальный)
         if (_runner != null && _runner.LocalPlayer != null && _runner.IsPlayer)
         {
-            // Проверяем, есть ли уже игрок в сцене
-            if (FindObjectOfType<PlayerMovement>() == null)
+            if (Object.FindFirstObjectByType<PlayerMovement>() == null)
             {
-                // Спавним игрока в точке (0, 1, 0)
-                _runner.Spawn(PlayerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
+                // Если мы указали точку спавна на сцене — берем её координаты.
+                // Если забыли указать — спавним по умолчанию на высоте 3 метра.
+                Vector3 spawnPos = SpawnPoint != null ? SpawnPoint.position : new Vector3(0, 3f, 0);
+                Quaternion spawnRot = SpawnPoint != null ? SpawnPoint.rotation : Quaternion.identity;
+
+                _runner.Spawn(PlayerPrefab, spawnPos, spawnRot);
             }
         }
     }

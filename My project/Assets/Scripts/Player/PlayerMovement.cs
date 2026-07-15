@@ -3,70 +3,87 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [Header("Movement")]
+    [Header("Movement Settings")]
     public float Speed = 5f;
     public float JumpHeight = 1.2f;
     public float Gravity = -15f;
-    public float TurnSmoothTime = 0.08f;
+    public float MouseSensitivity = 200f; 
 
     private CharacterController _controller;
     private Vector3 _velocity;
-    private float _turnSmoothVelocity;
-    private NetworkInput _input;
+    private bool _isSinglePlayer = false;
 
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
     }
 
-    public override void FixedUpdateNetwork()
+    public override void Spawned()
     {
-        // Двигаемся только на своей машине
-        if (!Object.HasStateAuthority) return;
-
-        // ---- ПОЛУЧАЕМ ВВОД ИЗ СЕТИ (автоматически) ----
-        if (GetInput(out NetworkInput input))
+        // Проверяем, запущен ли сетевой движок Runner
+        if (Runner == null || !Runner.IsRunning)
         {
-            _input = input;
+            _isSinglePlayer = true;
+            return;
         }
 
+        // Логика для ХОСТА (осталась нетронутой):
+        // Если персонаж чужой — отключаем ему физику, чтобы не дергался
+        if (Object != null && !Object.HasStateAuthority)
+        {
+            if (_controller != null) _controller.enabled = false;
+        }
+    }
+
+    // Этот метод вызывается ТОЛЬКО когда работает сеть (Хост)
+    public override void FixedUpdateNetwork()
+    {
+        if (_isSinglePlayer) return;
+
+        // Проверка прав для Хоста (не трогаем её!):
+        if (Object != null && !Object.HasStateAuthority) return;
+        
+        MovePlayer(Runner.DeltaTime);
+    }
+
+    // Этот метод работает в обычном режиме Unity (Синглплеер)
+    private void Update()
+    {
+        // Если запущен Хост — этот блок молчит, работает FixedUpdateNetwork
+        if (!_isSinglePlayer) return;
+
+        MovePlayer(Time.deltaTime);
+    }
+
+    // Общий метод управления — одинаково идеален и для Хоста, и для Сингла
+    private void MovePlayer(float deltaTime)
+    {
+        if (_controller == null || !_controller.enabled) return;
+
+        // ---- ВРАЩЕНИЕ ТЕЛА МЫШКОЙ ----
+        float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity * deltaTime;
+        transform.Rotate(Vector3.up * mouseX);
+
         // ---- ГРАВИТАЦИЯ ----
-        _velocity.y += Gravity * Runner.DeltaTime;
+        if (_controller.isGrounded && _velocity.y < 0)
+        {
+            _velocity.y = -2f; 
+        }
+        _velocity.y += Gravity * deltaTime;
+
+        // ---- ВВОД WASD ----
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * x + transform.forward * z;
+        _controller.Move(move * Speed * deltaTime);
 
         // ---- ПРЫЖОК ----
-        if (_input.Jump && _controller.isGrounded)
+        if (Input.GetKey(KeyCode.Space) && _controller.isGrounded)
         {
             _velocity.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
         }
 
-        // ---- ДВИЖЕНИЕ ----
-        Vector3 direction = new Vector3(_input.Horizontal, 0, _input.Vertical).normalized;
-
-        if (direction.magnitude >= 0.1f)
-        {
-            // Плавный поворот
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle,
-                ref _turnSmoothVelocity, TurnSmoothTime);
-            transform.rotation = Quaternion.Euler(0, angle, 0);
-
-            // Движение вперёд
-            Vector3 move = transform.forward * Speed;
-            move.y = _velocity.y;
-            _controller.Move(move * Runner.DeltaTime);
-        }
-        else
-        {
-            // Только гравитация
-            _controller.Move(_velocity * Runner.DeltaTime);
-        }
-
-        // ---- КАМЕРА ----
-        if (Camera.main != null && Object.HasStateAuthority)
-        {
-            Vector3 camPos = transform.position + new Vector3(0, 1.8f, -4f);
-            Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, camPos, Time.deltaTime * 10f);
-            Camera.main.transform.LookAt(transform.position + Vector3.up * 1.2f);
-        }
+        _controller.Move(_velocity * deltaTime);
     }
 }

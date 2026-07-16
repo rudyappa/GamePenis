@@ -27,21 +27,24 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
 
-        // Логика для ХОСТА (осталась нетронутой):
-        // Если персонаж чужой — отключаем ему физику, чтобы не дергался
-        if (Object != null && !Object.HasStateAuthority)
+        // --- ВАЖНОЕ ИЗМЕНЕНИЕ ДЛЯ МУЛЬТИПЛЕЕРА ---
+        // Если этот персонаж принадлежит НЕ нам (мы им не управляем)
+        if (Object != null && !Object.HasInputAuthority)
         {
+            // Отключаем физику и сам скрипт управления на чужом персонаже
             if (_controller != null) _controller.enabled = false;
+            this.enabled = false;
         }
     }
 
-    // Этот метод вызывается ТОЛЬКО когда работает сеть (Хост)
+    // Вызывается в мультиплеере (и для Хоста, и для Shared Client)
     public override void FixedUpdateNetwork()
     {
         if (_isSinglePlayer) return;
 
-        // Проверка прав для Хоста (не трогаем её!):
-        if (Object != null && !Object.HasStateAuthority) return;
+        // --- ВАЖНОЕ ИЗМЕНЕНИЕ ---
+        // Двигаем персонажа только в том случае, если у нас есть права на ввод (HasInputAuthority)
+        if (Object != null && !Object.HasInputAuthority) return;
         
         MovePlayer(Runner.DeltaTime);
     }
@@ -49,13 +52,13 @@ public class PlayerMovement : NetworkBehaviour
     // Этот метод работает в обычном режиме Unity (Синглплеер)
     private void Update()
     {
-        // Если запущен Хост — этот блок молчит, работает FixedUpdateNetwork
+        // Если запущен мультиплеер — этот блок молчит, работает FixedUpdateNetwork
         if (!_isSinglePlayer) return;
 
         MovePlayer(Time.deltaTime);
     }
 
-    // Общий метод управления — одинаково идеален и для Хоста, и для Сингла
+    // Общий метод управления — одинаково идеален и для Хоста, и для Клиента, и для Сингла
     private void MovePlayer(float deltaTime)
     {
         if (_controller == null || !_controller.enabled) return;

@@ -398,7 +398,7 @@ GameObject:
   - component: {fileID: 4017660411786030892}
   - component: {fileID: 5362188943996237700}
   m_Layer: 0
-  m_Name: 'Player 1 '
+  m_Name: Player 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -452,7 +452,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7dad7138a8578f04bbbd1ac5b1c3eba6, type: 2}
+  - {fileID: 2100000, guid: 834f142e3a714e34faa686e9476d2dee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -563,7 +563,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 539868647
+  SortKey: 38425
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []

@@ -1,59 +1,111 @@
 using UnityEngine;
 using Fusion;
 
-public class PickableObject : NetworkBehaviour
+public class PickableObject : NetworkBehaviour, IStateAuthorityChanged
 {
+    [Networked] public NetworkBool IsHeld { get; set; }
+    [Networked] public PlayerRef HolderPlayer { get; set; }
+
     private Rigidbody rb;
     private Collider col;
     private NetworkTransform _netTransform;
+    private ChangeDetector _changeDetector;
+    private Transform _localHoldPoint;
+    private bool _pendingPickup;
+    private bool _pendingPlaceDown;
 
-    void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         _netTransform = GetComponent<NetworkTransform>();
     }
 
-    public void PickUp(Transform targetHoldPoint)
+    public override void Spawned()
     {
-        // 1. Запрашиваем права, если их нет
-        if (!Object.HasStateAuthority)
+        _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+    }
+
+    public override void Render()
+    {
+        foreach (var change in _changeDetector.DetectChanges(this))
         {
+            if (change == nameof(IsHeld))
+            {
+                ApplyHeldVisuals();
+            }
+        }
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (IsHeld && Object.HasStateAuthority && _localHoldPoint != null)
+        {
+            transform.position = _localHoldPoint.position;
+            transform.rotation = _localHoldPoint.rotation;
+        }
+    }
+
+    public void PickUp(Transform holdPoint)
+    {
+        _localHoldPoint = holdPoint;
+
+        if (Object.HasStateAuthority)
+        {
+            DoPickUp();
+        }
+        else
+        {
+            _pendingPickup = true;
             Object.RequestStateAuthority();
         }
-
-        // 2. ОТКЛЮЧАЕМ сетевой трансформ, чтобы он не дергал кубик назад и не создавал 1 FPS лаги!
-        if (_netTransform != null)
-        {
-            _netTransform.enabled = false;
-        }
-
-        // 3. Выключаем физику, чтобы кубик стал послушным
-        if (rb != null)
-        {
-            rb.isKinematic = true;
-            rb.useGravity = false;
-        }
-
-        if (col != null) col.isTrigger = true;
-
-        // 4. Привязываем кубик к руке обычным методом Unity
-        transform.SetParent(targetHoldPoint);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
     }
 
     public void PlaceDown()
     {
-        if (!Object.HasStateAuthority)
+        if (Object.HasStateAuthority)
         {
+            DoPlaceDown();
+        }
+        else
+        {
+            _pendingPlaceDown = true;
             Object.RequestStateAuthority();
         }
+    }
 
-        // 1. Отвязываем от руки
-        transform.SetParent(null);
+    // Вызывается автоматически Fusion'ом, когда права реально перешли к нам
+    public void StateAuthorityChanged()
+    {
+        if (Object.HasStateAuthority)
+        {
+            if (_pendingPickup)
+            {
+                _pendingPickup = false;
+                DoPickUp();
+            }
+            if (_pendingPlaceDown)
+            {
+                _pendingPlaceDown = false;
+                DoPlaceDown();
+            }
+        }
+    }
 
-        // 2. Возвращаем физику
+    private void DoPickUp()
+    {
+        IsHeld = true;
+        HolderPlayer = Runner.LocalPlayer;
+        ApplyHeldVisuals();
+    }
+
+    private void DoPlaceDown()
+    {
+        IsHeld = false;
+        HolderPlayer = PlayerRef.None;
+        _localHoldPoint = null;
+        ApplyHeldVisuals();
+
         if (rb != null)
         {
             rb.isKinematic = false;
@@ -61,13 +113,15 @@ public class PickableObject : NetworkBehaviour
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
+    }
 
-        if (col != null) col.isTrigger = false;
+    private void ApplyHeldVisuals()
+    {
+        if (col != null) col.isTrigger = IsHeld;
 
-        // 3. ВКЛЮЧАЕМ сетевой трансформ обратно, чтобы он снова синхронизировал кубик на земле
-        if (_netTransform != null)
+        if (IsHeld)
         {
-            _netTransform.enabled = true;
+            if (rb != null) { rb.isKinematic = true; rb.useGravity = false; }
         }
     }
 }

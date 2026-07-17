@@ -1,6 +1,7 @@
 using UnityEngine;
+using Fusion;
 
-public class PlayerInteract : MonoBehaviour
+public class PlayerInteract : NetworkBehaviour
 {
     public float interactRange = 3f;
     public Camera playerCamera;
@@ -9,10 +10,10 @@ public class PlayerInteract : MonoBehaviour
 
     void Update()
     {
+        if (Object != null && !Object.HasInputAuthority) return;
+
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
-
-        Debug.DrawRay(ray.origin, ray.direction * interactRange, Color.red);
 
         bool lookingAtPickable = false;
         GameObject target = null;
@@ -36,8 +37,7 @@ public class PlayerInteract : MonoBehaviour
                 GameObject held = inventory.GetSelectedItem();
                 if (held != null)
                 {
-                    PickableObject heldPickable = held.GetComponent<PickableObject>();
-                    heldPickable.PlaceDown();
+                    held.GetComponent<PickableObject>().PlaceDown();
                     inventory.ClearSelectedSlot();
                 }
             }

@@ -13,6 +13,9 @@ public class PlayerMovement : NetworkBehaviour
     private Vector3 _velocity;
     private bool _isSinglePlayer = false;
 
+    // Переменная для надежного запоминания нажатия прыжка
+    private bool _jumpBuffered = false;
+
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -20,45 +23,56 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void Spawned()
     {
-        // Проверяем, запущен ли сетевой движок Runner
         if (Runner == null || !Runner.IsRunning)
         {
             _isSinglePlayer = true;
             return;
         }
 
-        // --- ВАЖНОЕ ИЗМЕНЕНИЕ ДЛЯ МУЛЬТИПЛЕЕРА ---
-        // Если этот персонаж принадлежит НЕ нам (мы им не управляем)
         if (Object != null && !Object.HasInputAuthority)
         {
-            // Отключаем физику и сам скрипт управления на чужом персонаже
             if (_controller != null) _controller.enabled = false;
             this.enabled = false;
         }
     }
 
-    // Вызывается в мультиплеере (и для Хоста, и для Shared Client)
+    // Ввод мышки и прыжка ловим в обычном кадре (Update) — так он никогда не пропадёт
+    private void Update()
+    {
+        // Считываем прыжок для сетевого игрока
+        if (!_isSinglePlayer)
+        {
+            if (Object != null && Object.HasInputAuthority)
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    _jumpBuffered = true;
+                }
+            }
+            return;
+        }
+
+        // Одиночная игра
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            _jumpBuffered = true;
+        }
+        MovePlayer(Time.deltaTime);
+    }
+
+    // Применяем движение и физику в сетевом тике
     public override void FixedUpdateNetwork()
     {
         if (_isSinglePlayer) return;
 
-        // --- ВАЖНОЕ ИЗМЕНЕНИЕ ---
-        // Двигаем персонажа только в том случае, если у нас есть права на ввод (HasInputAuthority)
         if (Object != null && !Object.HasInputAuthority) return;
         
         MovePlayer(Runner.DeltaTime);
+
+        // В конце сетевого тика обязательно сбрасываем прыжок
+        _jumpBuffered = false; 
     }
 
-    // Этот метод работает в обычном режиме Unity (Синглплеер)
-    private void Update()
-    {
-        // Если запущен мультиплеер — этот блок молчит, работает FixedUpdateNetwork
-        if (!_isSinglePlayer) return;
-
-        MovePlayer(Time.deltaTime);
-    }
-
-    // Общий метод управления — одинаково идеален и для Хоста, и для Клиента, и для Сингла
     private void MovePlayer(float deltaTime)
     {
         if (_controller == null || !_controller.enabled) return;
@@ -81,10 +95,11 @@ public class PlayerMovement : NetworkBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
         _controller.Move(move * Speed * deltaTime);
 
-        // ---- ПРЫЖОК ----
-        if (Input.GetKey(KeyCode.Space) && _controller.isGrounded)
+        // ---- ПРЫЖОК (теперь работает идеально!) ----
+        if (_jumpBuffered && _controller.isGrounded)
         {
             _velocity.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+            _jumpBuffered = false; // Сразу зануляем, чтобы не прыгнуть дважды
         }
 
         _controller.Move(_velocity * deltaTime);

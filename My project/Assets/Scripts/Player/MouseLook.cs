@@ -1,7 +1,6 @@
 using Fusion;
 using UnityEngine;
 
-// Изменяем наследование с MonoBehaviour на NetworkBehaviour, чтобы иметь доступ к сети Fusion
 public class MouseLook : NetworkBehaviour
 {
     public float mouseSensitivity = 200f;
@@ -14,10 +13,9 @@ public class MouseLook : NetworkBehaviour
         Cursor.visible = false;
     }
 
-    // Метод Spawned запускается Photon-ом, когда объект появляется в сети
     public override void Spawned()
     {
-        // Если у нас НЕТ прав на управление этим персонажем — выключаем его камеру и этот скрипт!
+        // Проверяем: если это сетевой объект и у нас НЕТ прав на него — выключаем камеру
         if (Object != null && !Object.HasInputAuthority)
         {
             Camera cam = GetComponent<Camera>();
@@ -32,7 +30,9 @@ public class MouseLook : NetworkBehaviour
 
     void Update()
     {
-        // Если это не наш персонаж, код дальше выполняться не будет (скрипт уже выключен в Spawned)
+        // ЗАЩИТА: Если сеть запущена, но у нас нет прав на этот объект (это чужой игрок), игнорируем ввод
+        if (Object != null && !Object.HasInputAuthority) return;
+
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
         xRotation -= mouseY;

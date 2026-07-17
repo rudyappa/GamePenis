@@ -1,63 +1,73 @@
 using UnityEngine;
+using Fusion;
 
-public class PickableObject : MonoBehaviour
+public class PickableObject : NetworkBehaviour
 {
-    public Transform holdPoint;
     private Rigidbody rb;
     private Collider col;
+    private NetworkTransform _netTransform;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+        _netTransform = GetComponent<NetworkTransform>();
+    }
 
-        if (rb == null) rb = gameObject.AddComponent<Rigidbody>();
-
-        rb.mass = 1f;
-        rb.linearDamping = 0.5f;
-
-        // Игнорируем столкновение с игроком, чтобы предмет не "выталкивало" при отпускании
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
+    public void PickUp(Transform targetHoldPoint)
+    {
+        // 1. Запрашиваем права, если их нет
+        if (!Object.HasStateAuthority)
         {
-            Collider playerCollider = player.GetComponent<CharacterController>();
-            if (playerCollider != null)
-            {
-                Physics.IgnoreCollision(col, playerCollider, true);
-            }
+            Object.RequestStateAuthority();
         }
-    }
 
-    public void PickUp(Transform holdPoint)
-{
-    rb.isKinematic = true;
-    transform.SetParent(holdPoint);
-    
-    // Берём настройки позы из ItemData
-    ItemData data = GetComponent<ItemData>();
-    if (data != null)
-    {
-        transform.localPosition = data.holdPosition;
-        transform.localRotation = Quaternion.Euler(data.holdRotation);
-    }
-    else
-    {
-        // Если нет ItemData — ставим в центр (как раньше)
+        // 2. ОТКЛЮЧАЕМ сетевой трансформ, чтобы он не дергал кубик назад и не создавал 1 FPS лаги!
+        if (_netTransform != null)
+        {
+            _netTransform.enabled = false;
+        }
+
+        // 3. Выключаем физику, чтобы кубик стал послушным
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
+
+        if (col != null) col.isTrigger = true;
+
+        // 4. Привязываем кубик к руке обычным методом Unity
+        transform.SetParent(targetHoldPoint);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
     }
 
-    col.enabled = false;
-}
+    public void PlaceDown()
+    {
+        if (!Object.HasStateAuthority)
+        {
+            Object.RequestStateAuthority();
+        }
 
-public void PlaceDown()
-{
-    transform.SetParent(null);
-    rb.isKinematic = false;
-    rb.linearVelocity = Vector3.zero;
-    rb.angularVelocity = Vector3.zero;
+        // 1. Отвязываем от руки
+        transform.SetParent(null);
 
-    // ВКЛЮЧАЕМ КОЛЛАЙДЕР
-    col.enabled = true;
-}
+        // 2. Возвращаем физику
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        if (col != null) col.isTrigger = false;
+
+        // 3. ВКЛЮЧАЕМ сетевой трансформ обратно, чтобы он снова синхронизировал кубик на земле
+        if (_netTransform != null)
+        {
+            _netTransform.enabled = true;
+        }
+    }
 }
